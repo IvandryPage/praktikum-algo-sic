@@ -263,14 +263,6 @@ void loadFromFile(Penduduk *kependudukan, int &jumlah_data) {
     return;
   }
 
-  // // menghitung berapa data yang ada di dalam file biner
-  // // dihitung berdasarkan ukuran data atau file size dari data yang disimpan
-  // // pada kasus ini, ukuran struct Penduduk
-  // fseek(fptr, 0, SEEK_END);
-  // int dat_size = ftell(fptr);
-  // rewind(fptr);
-  // jumlah_data = dat_size / sizeof(Penduduk);
-
   jumlah_data = fread(kependudukan, sizeof(Penduduk), kMaxData, fptr);
   fclose(fptr);
 }
