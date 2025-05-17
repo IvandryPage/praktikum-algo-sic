@@ -2,9 +2,16 @@
 #include <iostream>
 
 struct Roti {
+  static int id_count;
+  int id;
   std::string jenis;
   int harga;
+
+  Roti() : id(id_count++) {}
+  Roti(std::string jenis, int harga)
+      : jenis(jenis), harga(harga), id(id_count++) {}
 };
+int Roti::id_count = 0;
 
 struct Pesanan {
   static int id_count;
@@ -20,9 +27,8 @@ struct Pesanan {
       : nama(nama),
         roti(roti),
         jumlah(jumlah),
-        total_harga(roti.harga * jumlah) {
-    nomor_antrean = id_count++;
-  }
+        total_harga(roti.harga * jumlah),
+        nomor_antrean(id_count++) {}
 };
 
 struct Node {
@@ -110,8 +116,7 @@ Queue antrean;
 Stack riwayat;
 int Pesanan::id_count = 1;
 
-template <typename T>
-void printTable(T* start_point) {
+void printTable(Node* start_point) {
   std::cout << std::left << std::setw(5) << "No" << std::setw(20) << "Nama"
             << std::setw(15) << "Jenis Roti" << std::setw(8) << "Jumlah"
             << std::setw(12) << "Total(Rp)"
@@ -127,6 +132,34 @@ void printTable(T* start_point) {
               << p.jumlah << std::setw(12) << p.total_harga << "\n";
     x = x->next;
   }
+}
+
+void loadRiwayat(Roti* data_roti) {
+  FILE* fptr = fopen("riwayat_roti.txt", "r");
+  if (!fptr) return;
+
+  char nama[100];
+  int id_roti, jumlah;
+  while (fscanf(fptr, "%s %d %d", nama, &id_roti, &jumlah) != EOF) {
+    std::string nama_str(nama);
+    Pesanan p(nama_str, data_roti[id_roti], jumlah);
+    riwayat.push(p);
+  }
+
+  fclose(fptr);
+}
+
+void saveRiwayat() {
+  FILE* fptr = fopen("riwayat_roti.txt", "w");
+  if (!fptr) return;
+
+  Node* bantu = riwayat.bottom;
+  while (bantu != nullptr) {
+    fprintf(fptr, "%s %d %d\n", bantu->info.nama.data(), bantu->info.roti.id,
+            bantu->info.jumlah);
+    bantu = bantu->next;
+  }
+  fclose(fptr);
 }
 
 void ambilAntrean(Roti* data_roti, int size) {
@@ -168,6 +201,7 @@ void layaniPelanggan() {
   }
 
   riwayat.push(antrean.front->info);
+  saveRiwayat();
   std::cout << "\nMelayani pelanggan: " << antrean.front->info.nama << "\n";
   antrean.dequeue();
 }
@@ -179,7 +213,7 @@ void tampilkanPesanan() {
   }
 
   std::cout << "\n=== Daftar Pesanan ===\n";
-  printTable<Node>(antrean.front);
+  printTable(antrean.front);
 }
 
 void batalkanPesanan() {
@@ -215,12 +249,8 @@ void riwayatPesanan() {
   }
 
   std::cout << "\n=== Riwayat Antrian ===\n";
-  printTable<Node>(riwayat.bottom);
+  printTable(riwayat.bottom);
 }
-
-void loadRiwayat() { Pesanan p; }
-
-void saveRiwayat() {}
 
 int main() {
   antrean.create();
@@ -229,6 +259,8 @@ int main() {
   Roti data_roti[]{Roti("Tawar", 8000),  Roti("Coklat", 10000),
                    Roti("Keju", 11000),  Roti("Pisang", 12000),
                    Roti("Sobek", 15000), Roti("Gandum", 10000)};
+
+  loadRiwayat(data_roti);
 
   int pilihan;
   do {
