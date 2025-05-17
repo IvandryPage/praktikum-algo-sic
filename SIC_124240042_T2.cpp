@@ -1,6 +1,16 @@
 #include <iomanip>
 #include <iostream>
 
+/**
+ * @brief TUGAS 2 TOKO ROTI MANIS LEZAT
+ * Galang Ivandry
+ * 124240042
+ * SI-C
+ * Sistem Informasi
+ * Praktikum Algoritma dan Struktur Data
+ *
+ */
+
 struct Roti {
   static int id_count;
   int id;
