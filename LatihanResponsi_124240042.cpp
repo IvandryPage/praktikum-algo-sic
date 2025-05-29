@@ -407,7 +407,17 @@ void IdlixTube::removeVideo() {
   TreeNode* target_node = data_video_.searchBST<true>(target);
 
   if (target_node) {
-    target_node->data_video.status = StatusVideo::TERSEDIA;
+    if (target_node->data_video.status != StatusVideo::TERSEDIA) {
+      std::cout << "Video yang ingin dihapus [sedang diputar / dalam "
+                   "antrean]\nYakin untuk tetap menghapus (y/t)? ";
+      char answer;
+      std::cin >> answer;
+      answer = std::tolower(answer);
+      if (answer == 't') {
+        return;
+      }
+    }
+
     action_history_.push(target_node->data_video);
     action_history_.atas->action = Action::REMOVE_VIDEO;
 
